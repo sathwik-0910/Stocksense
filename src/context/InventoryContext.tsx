@@ -213,52 +213,100 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const validateOperation = async (id: string): Promise<boolean> => {
+    const validateOperation = async (id: string): Promise<boolean> => {
     const op = operations.find((o) => o.id === id);
     if (!op) return false;
 
     const validatedAt = new Date().toISOString().replace("T", " ").substring(0, 16);
     const validatedBy = currentUser ? currentUser.name : "System Operator";
 
-    // Update lines to doneQty = demandQty
     const updatedLines = op.lines.map((line) => ({
       ...line,
       doneQty: line.demandQty,
     }));
 
-    // Update inventory stock based on operation type
     setProducts((prevProds) => {
       return prevProds.map((prod) => {
-        const line = op.lines.find((l) => l.productId === prod.id || l.sku === prod.sku);
+        const line = op.lines.find(
+          (l) => l.productId === prod.id || l.sku === prod.sku
+        );
         if (!line) return prod;
 
-        let delta = 0;
-        if (op.type === "receipt") delta = line.demandQty;
-        else if (op.type === "delivery") delta = -line.demandQty;
-        else if (op.type === "adjustment") delta = line.demandQty; // or adjustment offset
+        let newTotalStock = prod.totalStock;
+        const newWarehouseStock = { ...prod.warehouseStock };
 
-        const newStock = Math.max(0, prod.totalStock + delta);
+        if (op.type === "receipt") {
+          newTotalStock += line.demandQty;
+          if (op.destinationLocation) {
+            newWarehouseStock[op.destinationLocation] =
+              (newWarehouseStock[op.destinationLocation] || 0) + line.demandQty;
+          }
+        } else if (op.type === "delivery") {
+          newTotalStock -= line.demandQty;
+          if (op.sourceLocation) {
+            newWarehouseStock[op.sourceLocation] =
+              (newWarehouseStock[op.sourceLocation] || 0) - line.demandQty;
+          }
+        } else if (op.type === "transfer") {
+          if (op.sourceLocation) {
+            newWarehouseStock[op.sourceLocation] =
+              (newWarehouseStock[op.sourceLocation] || 0) - line.demandQty;
+          }
+          if (op.destinationLocation) {
+            newWarehouseStock[op.destinationLocation] =
+              (newWarehouseStock[op.destinationLocation] || 0) + line.demandQty;
+          }
+        } else if (op.type === "adjustment") {
+          newTotalStock += line.demandQty;
+          if (op.destinationLocation) {
+            newWarehouseStock[op.destinationLocation] =
+              (newWarehouseStock[op.destinationLocation] || 0) + line.demandQty;
+          }
+        }
+
+        newTotalStock = Math.max(0, newTotalStock);
+
         let newStatus = prod.status;
-        if (newStock === 0) newStatus = "out_of_stock";
-        else if (newStock <= prod.minStock) newStatus = "low_stock";
+        if (newTotalStock === 0) newStatus = "out_of_stock";
+        else if (newTotalStock <= prod.minStock) newStatus = "low_stock";
         else newStatus = "in_stock";
+
+        if (
+          newStatus !== prod.status &&
+          (newStatus === "low_stock" || newStatus === "out_of_stock")
+        ) {
+          setNotifications((prevN) => [
+  {
+    id: `notif-${Date.now().toString(36)}`,
+    type: "warning",
+    title: newStatus === "out_of_stock" ? "Out of stock" : "Low stock alert",
+    message: `${prod.name} (${prod.sku}) is now ${newStatus.replace("_", " ")}.`,
+    timestamp: validatedAt,
+    read: false,
+    actionLink: `/products?search=${prod.sku}`,
+  },
+  ...prevN,
+]);
+        }
 
         return {
           ...prod,
-          totalStock: newStock,
+          totalStock: newTotalStock,
+          warehouseStock: newWarehouseStock,
           status: newStatus,
           updatedAt: validatedAt,
         };
       });
     });
 
-    // Add Move History entries for each line
     op.lines.forEach((line) => {
       let qtyDelta = line.demandQty;
       if (op.type === "delivery") qtyDelta = -line.demandQty;
 
       const newMove: MoveLedgerEntry = {
-        id: `move-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 5)}`,
+        id: `move-${Date.now().toString(36)}-${Math.random()
+          .toString(36)
+          .substring(2, 5)}`,
         timestamp: validatedAt,
         reference: op.ref,
         operationType: op.type,
@@ -274,7 +322,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setMoveHistory((prev) => [newMove, ...prev]);
     });
 
-    // Mark Operation as Done
     setOperations((prev) =>
       prev.map((o) =>
         o.id === id
