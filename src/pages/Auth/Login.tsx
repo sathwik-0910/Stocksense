@@ -17,8 +17,9 @@ import { mockUsers } from "../../data/mockData";
 
 export const Login: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState("sarah.jenkins@apex-ims.io");
-  const [password, setPassword] = useState("••••••••••••");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [fullName, setFullName] = useState("");
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,17 +28,23 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      // Log in with primary user or matched email
-      const matched = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase()) || mockUsers[0];
-      login(matched);
-      navigate("/");
-    }, 500);
-  };
+  setTimeout(() => {
+    setIsLoading(false);
+    const matched = mockUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+    if (!matched) {
+      setError("Invalid email or password.");
+      return;
+    }
+    login(matched);
+    navigate("/");
+  }, 500);
+};
 
   const handleQuickLogin = (userIndex: number) => {
     login(mockUsers[userIndex]);
@@ -193,7 +200,8 @@ export const Login: React.FC = () => {
                 />
               </div>
             </div>
-
+            
+            {error && <p className="text-xs text-rose-400 -mt-1">{error}</p>}
             <button
               type="submit"
               disabled={isLoading}

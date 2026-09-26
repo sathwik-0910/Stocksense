@@ -93,6 +93,7 @@ export interface UserProfile {
   role: "Admin" | "Inventory Manager" | "Logistics Lead" | "Auditor";
   avatar: string;
   warehouseAccess: string[];
+  password:string;
 }
 
 export interface NotificationItem {
