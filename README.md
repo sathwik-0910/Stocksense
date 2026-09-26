@@ -4,7 +4,7 @@ A modern, visually striking dark-mode Inventory Management System web applicatio
 
 ## 🎯 Target Users
 - **Inventory Managers** – manage incoming & outgoing stock
-- **Warehouse Staff** – perform transfers, picking, shelving, and counting
+- **Warehouse Staff** – perform transfers, picking, shelving, and counting.
 
 ## 🔐 Authentication
 - Email/password sign up & login
