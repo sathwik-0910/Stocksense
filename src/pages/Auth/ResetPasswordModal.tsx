@@ -19,6 +19,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [timer, setTimer] = useState(60);
+  const [generatedOtp, setGeneratedOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,7 +33,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
     return () => clearInterval(interval);
   }, [step, timer]);
 
-  const handleSendOtp = (e: React.FormEvent) => {
+    const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes("@")) {
       setError("Please enter a valid work email address");
@@ -41,6 +42,9 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
     setError("");
     setIsLoading(true);
     setTimeout(() => {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      setGeneratedOtp(code);
+      console.log("DEMO OTP (would be emailed):", code);
       setIsLoading(false);
       setStep("otp");
       setTimer(60);
@@ -65,10 +69,14 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
     }
   };
 
-  const handleVerifyOtp = () => {
+    const handleVerifyOtp = () => {
     const code = otp.join("");
     if (code.length < 6) {
       setError("Please enter all 6 digits");
+      return;
+    }
+    if (code !== generatedOtp) {
+      setError("Incorrect code. Check the browser console for your demo OTP.");
       return;
     }
     setError("");
