@@ -170,6 +170,39 @@ The application is fully responsive and works on:
 - **Typography**: Inter (body), JetBrains Mono (code/numbers)
 - **Effects**: Glass panels, blur backgrounds, animated transitions
 
+## 🚦 Implementation Status
+
+This is a **working prototype** built for hackathon demo purposes. Full transparency on what's real vs. planned below.
+
+### ✅ Fully Functional
+
+| Feature | Status |
+|---|---|
+| 🔐 Email/Password Authentication | ✅ Real credential verification |
+| 📱 OTP Password Reset | ✅ Real 6-digit code generation & verification |
+| 📥 Receipts, 📤 Deliveries, 🔄 Transfers, ⚖️ Adjustments | ✅ All correctly update stock in real time |
+| 🔔 Auto Low-Stock Notifications | ✅ Triggers automatically, toggleable in Settings |
+| 📜 Move Ledger & CSV Export | ✅ Full audit trail |
+| 🏢 Multi-Warehouse Stock Tracking | ✅ Per-location breakdown, updated correctly by every operation |
+
+### 🔮 Prototype / Coming Soon
+
+| Feature | Status |
+|---|---|
+| ☁️ Cloud Backend (Supabase/Firebase) | 🚧 Currently `localStorage` only — planned for true multi-user real-time sync |
+| 🤖 AI Copilot PO Suggestions | 🚧 Placeholder, not yet implemented |
+| 🔒 Strict Consignment Validation | 🚧 Placeholder, not yet implemented |
+
+### 🔑 Demo Credentials
+
+| 👤 Name | 📧 Email | 🔑 Password | 🛡️ Role |
+|---|---|---|---|
+| Sarah Jenkins | `sarah.jenkins@apex-ims.io` | `Admin123!` | Admin |
+| Alex Chen | `alex.chen@apex-ims.io` | `Manager123!` | Inventory Manager |
+| David Vance | `david.vance@apex-ims.io` | `Logistics123!` | Logistics Lead |
+
+> 💡 **Note:** Forgot your password? Use the OTP reset flow — the demo code is logged to your browser console (`F12` → Console tab) in place of a real email service.
+
 ## 📄 License
 MIT License - feel free to use and modify for your inventory management needs.
 
