@@ -12,7 +12,7 @@ A modern, visually striking dark-mode Inventory Management System web applicatio
 - Redirect to Inventory Dashboard after successful login
 
 ## 📊 Dashboard View
-The landing page provides a real-time snapshot of inventory operations:
+The landing page provides a real-time snapshot of inventory operations-
 
 ### Key Performance Indicators (KPIs)
 - **Total Products in Stock** – Overall inventory valuation
