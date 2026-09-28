@@ -212,3 +212,5 @@ MIT License - feel free to use and modify for your inventory management needs.
 - Icons by Lucide
 - Charts by Recharts
 - Animations by Framer Motion
+
+## Prototype - https://stocksense-gold-nu.vercel.app/
